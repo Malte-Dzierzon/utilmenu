@@ -1,0 +1,1 @@
+setsid foot -a float-term bash -lc 'sudo nix-env --list-generations --profile /nix/var/nix/profiles/system; read -rp "Enter to close " _' & disown

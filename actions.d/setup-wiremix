@@ -1,0 +1,1 @@
+setsid foot -a float-term wiremix & disown

@@ -1,0 +1,1 @@
+setsid foot -a float-term bash -lc 'cd /etc/nixos 2>/dev/null && sudo nix flake update; read -rp "Done — Enter " _' & disown

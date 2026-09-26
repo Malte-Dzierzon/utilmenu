@@ -1,0 +1,1 @@
+loginctl lock-session 2>/dev/null || niri msg action power-off-monitors & disown

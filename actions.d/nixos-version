@@ -1,0 +1,1 @@
+setsid foot -a float-term bash -lc 'nixos-version; nix-store --gc --print-roots 2>/dev/null | grep -c run; read -rp "Enter to close " _' & disown

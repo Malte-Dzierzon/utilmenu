@@ -1,0 +1,1 @@
+setsid foot -a float-term bash -lc 'sudo nixos-rebuild dry-build 2>&1 | tail -20; read -rp "Enter to close " _' & disown

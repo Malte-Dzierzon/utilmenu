@@ -1,0 +1,2 @@
+sleep 0.15
+noctalia msg panel-toggle wallpaper & disown

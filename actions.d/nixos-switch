@@ -1,0 +1,1 @@
+setsid foot -a float-term bash -lc 'sudo nixos-rebuild switch; read -rp "Done — Enter " _' & disown
