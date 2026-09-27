@@ -27,20 +27,19 @@ cat > "$OUT" <<EOF
 * { all: unset; }
 
 .box-wrapper {
-  background: alpha(@m_base, $BAR_OP);
+  background: alpha(@m_base, 0.90);
   padding: 12px;
   border-radius: ${R}px;
-  border: none;
+  border: 1px solid alpha(@m_text, 0.35);
 }
 
 .input {
   caret-color: @m_text;
-  background: transparent;
+  background: alpha(@m_base, 0.6);
   padding: 8px 10px;
   color: @m_text;
   border-radius: 0px;
-  border: none;
-  border-bottom: 1px solid alpha(@m_accent, 0.35);
+  border: 1px solid alpha(@m_text, 0.45);
   font-family: "$FONT";
   font-size: 14px;
 }
@@ -56,7 +55,11 @@ cat > "$OUT" <<EOF
 
 child:selected .item-box,
 row:selected .item-box {
-  background: alpha(@m_accent, 0.22);
+  background: alpha(@m_accent, 0.35);
+}
+child:selected *,
+row:selected * {
+  color: @m_base;
 }
 
 .item-text { font-family: "$FONT"; font-size: 14px; color: @m_text; }

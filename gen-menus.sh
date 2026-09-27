@@ -13,9 +13,15 @@ while IFS='|' read -r kind id parent hex label handler alias desc; do
   LABEL["$id"]="$label"; PARENT["$id"]="${parent:-root}"; HANDLER["$id"]="$handler"; HEX["$id"]="$hex"
   IDS+=("$id")
 done < <(grep -v '^#' "$CONF" | grep -v '^$')
-hexchar() { # NF-Codepoint -> UTF-8-Zeichen (python, kein Aberglaube)
-  python3 -c "import sys; print(chr(int(sys.argv[1],16)), end='')" "$1" 2>/dev/null || printf '•'
-}
+declare -A HEXCACHE=()
+while IFS=: read -r hx ch; do HEXCACHE["$hx"]="$ch"; done < <(grep -v '^#' "$CONF" | grep -v '^$' | cut -d'|' -f4 | sort -u | python3 -c "
+import sys
+for line in sys.stdin:
+    hx = line.strip() or '0'
+    try: print(hx + ':' + chr(int(hx, 16)))
+    except Exception: print(hx + ':•')
+")
+hexchar() { printf '%s' "${HEXCACHE[$1]:-•}"; }
 declare -A HAS_KIDS=()
 for id in "${IDS[@]}"; do HAS_KIDS["${PARENT[$id]}"]=1; done
 is_cat() { [[ -n "${HAS_KIDS[$1]:-}" ]] || [[ "${HANDLER[$1]}" == submenu:* ]]; }

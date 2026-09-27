@@ -131,10 +131,18 @@ function UtilSearchRun(value, args, query)
 end
 function UtilSearchLaunch(value, args, query)
   local f = tostring(value or "")
-  local fh = io.popen("grep -m1 '^Exec=' '" .. f:gsub("'", "'\\''") .. "' 2>/dev/null | cut -d= -f2- | cut -d' ' -f1")
+  local qf = "'" .. f:gsub("'", "'\\''") .. "'"
+  local term = io.popen("grep -m1 '^Terminal=' " .. qf .. " 2>/dev/null | cut -d= -f2- | tr -d ' \\n'")
+  local is_tui = false
+  if term ~= nil then is_tui = (trim(term:read("*a") or "") == "true"); term:close() end
+  local ex = io.popen("grep -m1 '^Exec=' " .. qf .. " 2>/dev/null | cut -d= -f2- | sed 's/ %[fFuUick].*//' | tr -d '\\n'")
   local exe = ""
-  if fh ~= nil then exe = trim(fh:read("*a") or ""); fh:close() end
-  if exe ~= "" then
+  if ex ~= nil then exe = trim(ex:read("*a") or ""); ex:close() end
+  if exe == "" then return end
+  if is_tui then
+    local te = os.getenv("TERM_EMULATOR") or "foot"
+    os.execute("setsid " .. te .. " " .. exe:gsub("'", "'\\''") .. " >/dev/null 2>&1 &")
+  else
     os.execute("setsid '" .. exe:gsub("'", "'\\''") .. "' >/dev/null 2>&1 &")
   end
 end
