@@ -38,31 +38,21 @@ entry_for() { # $1 = id -> TOML-Block
 { echo 'name = "utilmenu"'; echo 'name_pretty = "Utilmenu"'; echo 'fixed_order = true'
   for id in "${IDS[@]}"; do [[ "${PARENT[$id]}" == root ]] || continue; echo; entry_for "$id"; done
 } > "$OUT/utilmenu.toml"
+# Submenüs als Lua: leer -> eigene Kinder (Navigation nativ via SubMenu),
+# Query -> GLOBAL über menu.conf + Apps (Walker fragt im Submenü nur aktiven Provider).
+rm -f "$OUT"/utilmenu_*.toml
 for cat in "${IDS[@]}"; do
   is_cat "$cat" || continue
-  { echo "name = \"utilmenu_$cat\""; echo "name_pretty = \"${LABEL[$cat]}\""; echo 'parent = "utilmenu"'; echo 'fixed_order = true'
-    for id in "${IDS[@]}"; do [[ "${PARENT[$id]}" == "$cat" ]] || continue; echo; entry_for "$id"; done
-    ICONDIR="${XDG_CACHE_HOME:-$HOME/.cache}/utilmenu-icons"
-    ICONCOLOR=""; [[ -f "$ICONDIR/.color" ]] && ICONCOLOR=$(cat "$ICONDIR/.color")
-    if [[ "$cat" == apps && -f "$CACHE" ]]; then
-      while IFS=$'\t' read -r _sp name file icon; do
-        # echte Start-Action aus .desktop (gtk-launch ist nicht installiert)
-        ISTERM=$(grep -m1 '^Terminal=' "$file" 2>/dev/null | cut -d= -f2- | tr -d ' \n' || true)
-        EXECCMD=$(grep -m1 '^Exec=' "$file" 2>/dev/null | cut -d= -f2- | sed 's/ %[fFuUick].*//;s/ %[FfUu]//' || true)
-        if [[ "$ISTERM" == true ]]; then LAUNCH="foot $EXECCMD"; else LAUNCH="$EXECCMD"; fi
-        [[ -n "$LAUNCH" ]] || LAUNCH="true"
-        [[ -n "$name" && -n "$file" ]] || continue
-        safe=$(printf '%s' "$name" | tr -c '[:alnum:]' '_' | cut -c1-40)
-        if [[ -n "$ICONCOLOR" && -f "$ICONDIR/$safe.png" ]]; then
-          icon="$ICONDIR/$safe.png"
-        fi
-        if [[ -n "$icon" ]]; then
-          printf '\n[[entries]]\ntext = "%s"\nicon = "%s"\nactions = { default = "%s" }\n' "$name" "$icon" "$LAUNCH"
-        else
-          printf '\n[[entries]]\ntext = "%s"\nactions = { default = "%s" }\n' "$name" "$LAUNCH"
-        fi
-      done < "$CACHE"
-    fi
-  } > "$OUT/utilmenu_$cat.toml"
+  {
+    echo "-- generiert aus menu.conf, NICHT hand-editieren (gen-menus.sh)"
+    echo "Name = \"utilmenu_$cat\""
+    echo "NamePretty = \"${LABEL[$cat]}\""
+    echo 'FixedOrder = true'
+    echo '_UM_CAT = "'"$cat"'"'
+    echo 'local M = dofile(os.getenv("HOME") .. "/.config/utilmenu2/elephant/submenu.lua")'
+    echo 'function GetEntries(query) return M.entries(_UM_CAT, query) end'
+    echo 'function UtilSubRun(v, a, q) return M.run(v) end'
+    echo 'function UtilSubLaunch(v, a, q) return M.launch(v) end'
+  } > "$OUT/utilmenu_$cat.lua"
 done
-echo "GENERATED: $(ls "$OUT"/utilmenu*.toml | wc -l) Menüs"
+echo "GENERATED: $(ls "$OUT"/utilmenu*.lua "$OUT"/utilmenu.toml 2>/dev/null | wc -l) Menüs"
