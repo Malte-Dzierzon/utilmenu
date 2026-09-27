@@ -1,0 +1,1 @@
+setsid xdg-open "https://search.nixos.org/options" & disown

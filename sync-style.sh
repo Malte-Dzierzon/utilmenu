@@ -4,6 +4,7 @@
 set -euo pipefail
 SET=~/.local/state/noctalia/settings.toml
 PAL=~/.cache/noctalia/starship-palette.toml
+[[ -f "$SET" && -f "$PAL" ]] || { echo "SKIP: Noctalia-Quelle fehlt, CSS bleibt"; exit 0; }
 OUT=~/.config/walker/themes/noctalia/style.css
 val() { grep -m1 -E "^\s*$1\s*=" "$SET" | sed -E 's/.*=\s*//;s/[",]//g' | awk '{print $1}'; }
 pal() { grep -m1 -E "^$1\s*=" "$PAL" | sed -E 's/.*"(#[0-9a-fA-F]+)".*/\1/'; }
@@ -15,6 +16,7 @@ BASE=${BASE:-#131314}; SURF=${SURF:-#1b1b1c}; TXT=${TXT:-#e4e2e3}; ACC=${ACC:-#b
 # radius_scale 0.0 -> eckig; sonst skaliert (Noctalia-Logik: scale * basis)
 px() { python3 -c "print(int(float('$1')*12))" 2>/dev/null || echo 0; }
 R=$(px "$RADIUS")
+[[ -f "$OUT" ]] && cp "$OUT" "$OUT.bak"
 cat > "$OUT" <<EOF
 /* utilmenu — generiert aus echter Noctalia-Config. NICHT hand-editieren, sync-style.sh laufen lassen.
    Quelle: settings.toml (radius_scale=$RADIUS bar_opacity=$BAR_OP font=$FONT) + M3-Palette (wallpaper). */

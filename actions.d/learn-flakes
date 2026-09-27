@@ -1,0 +1,1 @@
+setsid xdg-open "https://nixos-and-flakes.thiscute.world/nixos-with-flakes/introduction-to-flakes/" & disown
