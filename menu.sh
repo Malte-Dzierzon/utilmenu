@@ -11,6 +11,7 @@
 # and stdin-only filtering until Enter. This script is just open + cache.
 set -euo pipefail
 export GDK_BACKEND=wayland
+export PATH="$HOME/.local/bin:$PATH"  # elephant liegt dort (NixOS: nicht im system-PATH)
 source "${XDG_CONFIG_HOME:-$HOME/.config}/utilmenu2/menu.conf.sh"
 
 APPS_REFRESH() {

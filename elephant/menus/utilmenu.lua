@@ -200,16 +200,20 @@ function GetEntries(query)
     local ql = q:lower()
     local terms = {}
     for w in ql:gmatch("%S+") do table.insert(terms, w) end
+    local have = {}  -- Menueintrag ist autoritativ: App mit gleichem Namen faellt weg
     for i = 1, #ds.order do
       local e = ds.by_id[ds.order[i]]
       if e.parent ~= "root" and entry_matches(e, terms) then
         table.insert(out, search_entry(e, ds))
+        have[e.label:lower()] = true
       end
     end
     local apps = load_apps(ql)
     for i = 1, #apps do
-      table.insert(out, { Text = apps[i].name, Subtext = "Apps",
-        Value = apps[i].file, Actions = { default = "lua:UtilLaunchApp" } })
+      if not have[apps[i].name:lower()] then
+        table.insert(out, { Text = apps[i].name, Subtext = "Apps",
+          Value = apps[i].file, Actions = { default = "lua:UtilLaunchApp" } })
+      end
     end
   end
   return out

@@ -1,23 +1,22 @@
-# utilmenu Walker snippet — merge into ~/.config/walker/config.toml.
-# Dedicated Set "utilmenu": exact same window, only our menu + apps provider.
-# Live global search comes from Elephant (GetEntries(query) on every keystroke).
+# Merge into ~/.config/walker/config.toml (only this set + actions, nothing else).
+theme = "noctalia"
 
 [providers.sets.utilmenu]
-default = ["menus:utilmenu", "desktopapplications"]
+default = ["menus:utilsearch", "menus:utilmenu"]
 empty = ["menus:utilmenu"]
 
-# Navigation actions must keep the SAME window open (ClearReload), not close it.
-# Issue abenz1267/elephant#292 documents this exact mechanism: `after` controls
-# whether Walker stays open after a menu activation.
-[providers.actions."menus:utilmenu"]
-open = [{ action = "menus:open", bind = "Return", default = true, after = "ClearReload" }]
-default = [{ action = "menus:default", bind = "Return", after = "ClearReload" }]
-back = [
-  { action = "menus:parent", bind = "Return", default = true, after = "ClearReload" },
+# Native: menus:open navigates (submenu), default executes.
+# Return = the entry's default action (open OR run, per entry type).
+[providers.actions]
+"menus:utilmenu" = [
+  { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 
-# Placeholder while inside the menu.
 [placeholders."menus:utilmenu"]
 input = "Go…"
 list = "No Results"
+
+[keybinds]
+quick_activate = []
