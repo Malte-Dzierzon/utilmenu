@@ -19,7 +19,7 @@ APPS_REFRESH() {
       [[ -d "$d" ]] || continue
       for f in "$d"/*.desktop; do
         [[ -f "$f" ]] || continue
-        awk -F= '/^(NoDisplay|Hidden)=true/{skip=1} /^Name=/{name=substr($0,6)} /^Icon=/{icon=substr($0,6)} END{if(!skip && name) printf " \t%s\t%s\t%s\n", name, FILENAME, icon}' "$f"
+        awk -F= '/^(NoDisplay|Hidden)=true/{skip=1} /^Name=/&&!name{name=substr($0,6)} /^Icon=/{icon=substr($0,6)} END{if(!skip && name) printf " \t%s\t%s\t%s\n", name, FILENAME, icon}' "$f"
       done
     done | sort -fu -t$'\t' -k2,2
   } > "$CACHE.tmp" && mv "$CACHE.tmp" "$CACHE"
