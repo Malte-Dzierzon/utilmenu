@@ -112,11 +112,13 @@ function GetEntries(query)
   local fh = io.open(cache_file(), "r")
   if fh ~= nil then
     for line in fh:lines() do
-      local name, file = line:match("^[^\t]*\t([^\t]*)\t(.*)$")
+      local name, file, icon = line:match("^[^\t]*\t([^\t]*)\t([^\t]*)\t?(.*)$")
       if name ~= nil and name ~= "" and file ~= nil and file ~= "" then
         if name:lower():find(ql, 1, true) and not have[name:lower()] then
-          table.insert(out, { Text = name, Subtext = "Apps",
-            Value = file, Actions = { default = "lua:UtilSearchLaunch" } })
+          local e = { Text = name, Subtext = "Apps",
+            Value = file, Actions = { default = "lua:UtilSearchLaunch" } }
+          if icon ~= nil and icon ~= "" then e.Icon = icon end
+          table.insert(out, e)
         end
       end
     end

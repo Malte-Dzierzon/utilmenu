@@ -75,7 +75,8 @@ scrollbar { opacity: 0; }
 .keybinds,
 .global-keybinds,
 .item-keybinds { opacity: 0; font-size: 0px; min-width: 0px; min-height: 0px; margin: 0px; padding: 0px; }
-.normal-icons { -gtk-icon-size: 20px; }
+.normal-icons { -gtk-icon-size: 16px; }
+.item-icon { margin-right: 2px; }
 .large-icons { -gtk-icon-size: 32px; }
 EOF
 echo "SYNC-OK radius=${R}px font=$FONT base=$BASE accent=$ACC"

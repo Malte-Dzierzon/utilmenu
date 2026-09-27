@@ -43,9 +43,13 @@ for cat in "${IDS[@]}"; do
   { echo "name = \"utilmenu_$cat\""; echo "name_pretty = \"${LABEL[$cat]}\""; echo 'parent = "utilmenu"'; echo 'fixed_order = true'
     for id in "${IDS[@]}"; do [[ "${PARENT[$id]}" == "$cat" ]] || continue; echo; entry_for "$id"; done
     if [[ "$cat" == apps && -f "$CACHE" ]]; then
-      while IFS=$'\t' read -r _sp name file; do
+      while IFS=$'\t' read -r _sp name file icon; do
         [[ -n "$name" && -n "$file" ]] || continue
-        printf '\n[[entries]]\ntext = "%s"\nactions = { default = "gtk-launch %s" }\n' "$name" "$(basename "$file" .desktop)"
+        if [[ -n "$icon" ]]; then
+          printf '\n[[entries]]\ntext = "%s"\nicon = "%s"\nactions = { default = "gtk-launch %s" }\n' "$name" "$icon" "$(basename "$file" .desktop)"
+        else
+          printf '\n[[entries]]\ntext = "%s"\nactions = { default = "gtk-launch %s" }\n' "$name" "$(basename "$file" .desktop)"
+        fi
       done < "$CACHE"
     fi
   } > "$OUT/utilmenu_$cat.toml"
