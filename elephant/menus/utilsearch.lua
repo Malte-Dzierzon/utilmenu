@@ -117,7 +117,11 @@ function GetEntries(query)
         if name:lower():find(ql, 1, true) and not have[name:lower()] then
           local e = { Text = name, Subtext = "Apps",
             Value = file, Actions = { default = "lua:UtilSearchLaunch" } }
-          if icon ~= nil and icon ~= "" then e.Icon = icon end
+          local safe = name:gsub("[^%w]", "_"):sub(1, 40)
+          local rc = (os.getenv("HOME") or "") .. "/.cache/utilmenu-icons/" .. safe .. ".png"
+          local rf = io.open(rc, "r")
+          if rf ~= nil then rf:close(); e.Icon = rc
+          elseif icon ~= nil and icon ~= "" then e.Icon = icon end
           table.insert(out, e)
         end
       end

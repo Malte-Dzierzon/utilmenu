@@ -42,9 +42,15 @@ for cat in "${IDS[@]}"; do
   is_cat "$cat" || continue
   { echo "name = \"utilmenu_$cat\""; echo "name_pretty = \"${LABEL[$cat]}\""; echo 'parent = "utilmenu"'; echo 'fixed_order = true'
     for id in "${IDS[@]}"; do [[ "${PARENT[$id]}" == "$cat" ]] || continue; echo; entry_for "$id"; done
+    ICONDIR="${XDG_CACHE_HOME:-$HOME/.cache}/utilmenu-icons"
+    ICONCOLOR=""; [[ -f "$ICONDIR/.color" ]] && ICONCOLOR=$(cat "$ICONDIR/.color")
     if [[ "$cat" == apps && -f "$CACHE" ]]; then
       while IFS=$'\t' read -r _sp name file icon; do
         [[ -n "$name" && -n "$file" ]] || continue
+        safe=$(printf '%s' "$name" | tr -c '[:alnum:]' '_' | cut -c1-40)
+        if [[ -n "$ICONCOLOR" && -f "$ICONDIR/$safe.png" ]]; then
+          icon="$ICONDIR/$safe.png"
+        fi
         if [[ -n "$icon" ]]; then
           printf '\n[[entries]]\ntext = "%s"\nicon = "%s"\nactions = { default = "gtk-launch %s" }\n' "$name" "$icon" "$(basename "$file" .desktop)"
         else
