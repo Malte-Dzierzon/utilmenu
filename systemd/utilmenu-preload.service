@@ -1,0 +1,12 @@
+[Unit]
+Description=utilmenu cold-start preload (cache + walker service, no GUI)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/utilmenu2/menu.sh --preload
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical-session.target

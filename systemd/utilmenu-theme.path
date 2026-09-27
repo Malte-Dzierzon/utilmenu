@@ -1,0 +1,9 @@
+[Unit]
+Description=utilmenu live theming (watch Noctalia palette + settings)
+
+[Path]
+PathChanged=%h/.cache/noctalia/starship-palette.toml
+PathChanged=%h/.local/state/noctalia/settings.toml
+
+[Install]
+WantedBy=graphical-session.target

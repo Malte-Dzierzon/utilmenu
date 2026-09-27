@@ -1,0 +1,6 @@
+[Unit]
+Description=utilmenu live theming (resync Walker CSS)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/utilmenu2/sync-style.sh

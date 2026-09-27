@@ -51,11 +51,13 @@ cat > "$OUT" <<EOF
   border-radius: 0px;
   padding: 7px 10px;
   border: none;
+  transition: background 120ms ease-out;
 }
 
 child:selected .item-box,
 row:selected .item-box {
   background: alpha(@m_accent, 0.35);
+  transition: background 120ms ease-out;
 }
 child:selected *,
 row:selected * {

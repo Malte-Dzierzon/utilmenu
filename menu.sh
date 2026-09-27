@@ -34,6 +34,14 @@ APPS_NEED() { # Refresh nur wenn .desktop-Dirs neuer als Cache
   return 1
 }
 
+case "${1:-}" in
+  --preload) # Cold-Start ohne GUI: Cache + Service im Hintergrund, kein Fenster
+    APPS_NEED && APPS_REFRESH
+    pgrep -f "walker --gapplication-service" >/dev/null || (walker --gapplication-service &>/dev/null & disown)
+    exit 0
+    ;;
+esac
+
 APPS_NEED && APPS_REFRESH
 pgrep -f "walker --gapplication-service" >/dev/null || (walker --gapplication-service &>/dev/null & disown)
 
