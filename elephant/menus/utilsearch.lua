@@ -136,13 +136,20 @@ function UtilSearchLaunch(value, args, query)
   local is_tui = false
   if term ~= nil then is_tui = (trim(term:read("*a") or "") == "true"); term:close() end
   local ex = io.popen("grep -m1 '^Exec=' " .. qf .. " 2>/dev/null | cut -d= -f2- | sed 's/ %[fFuUick].*//' | tr -d '\\n'")
-  local exe = ""
-  if ex ~= nil then exe = trim(ex:read("*a") or ""); ex:close() end
-  if exe == "" then return end
+  local line = ""
+  if ex ~= nil then line = trim(ex:read("*a") or ""); ex:close() end
+  if line == "" then return end
+  -- erstes Wort = Binary, Rest = Args (nicht alles in ein Quote packen)
+  local bin, args = line:match("^(%S+)%s*(.*)$")
+  if bin == nil or bin == "" then return end
+  local function shq(s) return "'" .. s:gsub("'", "'\\''") .. "'" end
   if is_tui then
     local te = os.getenv("TERM_EMULATOR") or "foot"
-    os.execute("setsid " .. te .. " " .. exe:gsub("'", "'\\''") .. " >/dev/null 2>&1 &")
+    os.execute("setsid " .. te .. " " .. bin:gsub("'", "'\\''") .. (args ~= "" and " " .. args or "") .. " >/dev/null 2>&1 &")
+  elseif args ~= "" and bin:find("foot", 1, true) then
+    -- Exec bringt sein eigenes foot mit (tui-*.desktop): direkt starten
+    os.execute("setsid " .. bin:gsub("'", "'\\''") .. " " .. args .. " >/dev/null 2>&1 &")
   else
-    os.execute("setsid '" .. exe:gsub("'", "'\\''") .. "' >/dev/null 2>&1 &")
+    os.execute("setsid " .. shq(bin) .. (args ~= "" and " " .. args or "") .. " >/dev/null 2>&1 &")
   end
 end
