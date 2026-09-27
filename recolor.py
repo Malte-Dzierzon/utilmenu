@@ -8,8 +8,11 @@ def resolve(icon):
     if os.path.isfile(icon): return icon
     for base in [os.path.expanduser("~/.local/share/icons"),
                  "/run/current-system/sw/share/icons",
+                 "/run/current-system/sw/share/pixmaps",
                  os.path.expanduser("~/.nix-profile/share/icons"),
-                 "/usr/share/icons"]:
+                 os.path.expanduser("~/.nix-profile/share/pixmaps"),
+                 "/usr/share/icons",
+                 "/usr/share/pixmaps"]:
         for ext in (".png", ".svg"):
             import glob
             for pat in [f"{base}/hicolor/scalable/apps/{icon}{ext}",

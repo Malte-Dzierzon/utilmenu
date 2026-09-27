@@ -46,15 +46,20 @@ for cat in "${IDS[@]}"; do
     ICONCOLOR=""; [[ -f "$ICONDIR/.color" ]] && ICONCOLOR=$(cat "$ICONDIR/.color")
     if [[ "$cat" == apps && -f "$CACHE" ]]; then
       while IFS=$'\t' read -r _sp name file icon; do
+        # echte Start-Action aus .desktop (gtk-launch ist nicht installiert)
+        ISTERM=$(grep -m1 '^Terminal=' "$file" 2>/dev/null | cut -d= -f2- | tr -d ' \n' || true)
+        EXECCMD=$(grep -m1 '^Exec=' "$file" 2>/dev/null | cut -d= -f2- | sed 's/ %[fFuUick].*//;s/ %[FfUu]//' || true)
+        if [[ "$ISTERM" == true ]]; then LAUNCH="foot $EXECCMD"; else LAUNCH="$EXECCMD"; fi
+        [[ -n "$LAUNCH" ]] || LAUNCH="true"
         [[ -n "$name" && -n "$file" ]] || continue
         safe=$(printf '%s' "$name" | tr -c '[:alnum:]' '_' | cut -c1-40)
         if [[ -n "$ICONCOLOR" && -f "$ICONDIR/$safe.png" ]]; then
           icon="$ICONDIR/$safe.png"
         fi
         if [[ -n "$icon" ]]; then
-          printf '\n[[entries]]\ntext = "%s"\nicon = "%s"\nactions = { default = "gtk-launch %s" }\n' "$name" "$icon" "$(basename "$file" .desktop)"
+          printf '\n[[entries]]\ntext = "%s"\nicon = "%s"\nactions = { default = "%s" }\n' "$name" "$icon" "$LAUNCH"
         else
-          printf '\n[[entries]]\ntext = "%s"\nactions = { default = "gtk-launch %s" }\n' "$name" "$(basename "$file" .desktop)"
+          printf '\n[[entries]]\ntext = "%s"\nactions = { default = "%s" }\n' "$name" "$LAUNCH"
         fi
       done < "$CACHE"
     fi
