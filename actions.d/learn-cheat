@@ -1,4 +1,4 @@
-setsid foot -a float-term bash -lc 'cat <<C; read -rp "Enter to close " _
+setsid foot -a float-term bash -lc 'cat <<C; read -rp "Press Enter to close " _
 nix Befehle (Flakes):
   nix search nixpkgs HELLO      Paket suchen
   nix run nixpkgs#HELLO         starten ohne Install
@@ -7,5 +7,5 @@ nix Befehle (Flakes):
   nixos-rebuild test --flake .#HOST     testen (ohne Boot-Eintrag)
   nixos-rebuild build --flake .#HOST    nur bauen
   nix flake update               Inputs updaten
-  nix-collect-garbage -d         Generationen löschen
+  nix-collect-garbage -d         Delete old generations
 C' & disown

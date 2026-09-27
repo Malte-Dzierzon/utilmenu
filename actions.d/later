@@ -1,1 +1,1 @@
-notify-send "utilmenu" "Kommt mit dem NixOS-Manager…" & disown
+notify-send "utilmenu" "Coming with the NixOS manager…" & disown
