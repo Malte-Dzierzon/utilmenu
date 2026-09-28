@@ -29,7 +29,7 @@ cat > "$OUT" <<EOF
 * { all: unset; }
 
 .box-wrapper {
-  background: alpha(@m_base, 0.90);
+  background: alpha(@m_base, 0.72);
   padding: 12px;
   border-radius: ${R}px;
   border: 1px solid alpha(@m_text, 0.35);
@@ -37,7 +37,7 @@ cat > "$OUT" <<EOF
 
 .input {
   caret-color: @m_text;
-  background: alpha(@m_base, 0.6);
+  background: alpha(@m_base, 0.45);
   padding: 8px 10px;
   color: @m_text;
   border-radius: 0px;
