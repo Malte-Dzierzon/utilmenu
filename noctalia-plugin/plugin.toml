@@ -1,7 +1,7 @@
 id = "xealom/utilmenu"
 name = "Utilmenu"
 version = "1.0.0"
-plugin_api = 10
+plugin_api = 13
 author = "xealom"
 license = "MIT"
 icon = "menu"
@@ -14,3 +14,12 @@ entry = "provider.luau"
 prefix = "u"
 glyph = "menu"
 include_in_global_search = true
+
+[[panel]]
+id = "menu"
+entry = "panel.luau"
+width = 420
+height = 540
+placement = "floating"
+keyboard_focus = "exclusive"
+capture_keys = ["escape", "up", "down", "enter", "backspace"]

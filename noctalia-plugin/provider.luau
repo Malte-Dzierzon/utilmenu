@@ -9,9 +9,12 @@ local app_items = {}
 local last_refresh = 0
 
 local function split(s, sep)
-  local out, i = {}, 1
-  for part in (s .. sep):gmatch("(.-)" .. sep) do
-    out[i] = part; i = i + 1
+  -- sep als Plain-String (kein Pattern): "|" wäre sonst Alternation -> Endlosschleife
+  local out, i, from = {}, 1, 1
+  while true do
+    local a, b = s:find(sep, from, true)
+    if not a then out[i] = s:sub(from); break end
+    out[i] = s:sub(from, a - 1); i = i + 1; from = b + 1
   end
   return out
 end
