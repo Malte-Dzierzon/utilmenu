@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# App-Launch fürs Panel: .desktop lesen, TUI in foot, GUI direkt. WM-agnostisch.
+# Aufruf: app-launch <desktop-file>
+set -euo pipefail
+F="${1:?desktop file}"
+TERM_FLAG=$(grep -m1 '^Terminal=' "$F" 2>/dev/null | cut -d= -f2- | tr -d ' \n' || true)
+LINE=$(grep -m1 '^Exec=' "$F" 2>/dev/null | cut -d= -f2- | sed 's/ %[fFuUick].*//;s/ %[FfUu]//' || true)
+[[ -n "$LINE" ]] || exit 0
+if [[ "$TERM_FLAG" == "true" ]]; then
+  WD=$(ls -t "$XDG_RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v lock | head -1); WD=${WD##*/}
+  # shellcheck disable=SC2086
+  setsid env WAYLAND_DISPLAY="$WD" foot $LINE >/dev/null 2>&1 &
+else
+  setsid bash -c "$LINE" >/dev/null 2>&1 &
+fi
+disown
