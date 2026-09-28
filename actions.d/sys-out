@@ -1,1 +1,7 @@
-niri msg action quit & disown
+#!/usr/bin/env bash
+# Logout — WM-agnostisch.
+case "${XDG_CURRENT_DESKTOP:-}" in
+  *Hyprland*) hyprctl dispatch exit & disown ;;
+  *niri*) niri msg action quit & disown ;;
+  *) loginctl terminate-user "$USER" & disown ;;
+esac

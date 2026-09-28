@@ -1,1 +1,7 @@
-loginctl lock-session 2>/dev/null || niri msg action power-off-monitors & disown
+#!/usr/bin/env bash
+# Lock — WM-agnostisch (fällt auf Monitor-aus zurück).
+if loginctl lock-session 2>/dev/null; then exit 0; fi
+case "${XDG_CURRENT_DESKTOP:-}" in
+  *Hyprland*) hyprctl dispatch dpms off & disown ;;
+  *niri*) niri msg action power-off-monitors & disown ;;
+esac

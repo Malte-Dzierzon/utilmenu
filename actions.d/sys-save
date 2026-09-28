@@ -1,1 +1,6 @@
-niri msg action power-off-monitors & disown
+#!/usr/bin/env bash
+# Screensaver (Monitor aus) — WM-agnostisch.
+case "${XDG_CURRENT_DESKTOP:-}" in
+  *Hyprland*) hyprctl dispatch dpms off & disown ;;
+  *niri*) niri msg action power-off-monitors & disown ;;
+esac
