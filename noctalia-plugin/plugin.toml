@@ -1,0 +1,16 @@
+id = "xealom/utilmenu"
+name = "Utilmenu"
+version = "1.0.0"
+plugin_api = 10
+author = "xealom"
+license = "MIT"
+icon = "menu"
+description = "Utility menu as native launcher provider — categories, system actions, animations, apps."
+tags = ["launcher"]
+
+[[launcher_provider]]
+id = "utilmenu"
+entry = "provider.luau"
+prefix = "u"
+glyph = "menu"
+include_in_global_search = true
