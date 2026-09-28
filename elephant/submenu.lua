@@ -94,10 +94,10 @@ end
 local function child_entry(e, ds)
   local h = e.handler or ""
   if h:sub(1, 8) == "submenu:" then
-    return { Text = e.label, Icon = e.icon, Subtext = "›", Value = h:sub(9), SubMenu = "utilmenu_" .. h:sub(9) }
+    return { Text = e.label .. "  ›", Icon = e.icon, Value = h:sub(9), SubMenu = "utilmenu_" .. h:sub(9) }
   end
   if has_kids(ds, e.id) then
-    return { Text = e.label, Icon = e.icon, Subtext = "›", Value = e.id, SubMenu = "utilmenu_" .. e.id }
+    return { Text = e.label .. "  ›", Icon = e.icon, Value = e.id, SubMenu = "utilmenu_" .. e.id }
   end
   return { Text = e.label, Icon = e.icon, Value = (h:sub(1, 4) == "run:" and h:sub(5) or e.id),
     Actions = { default = "lua:UtilSubRun" } }
