@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
-# utilmenu launcher — ONE persistent Walker window over the Elephant menu backend.
-#
-#   Elephant: menus provider reads menus/utilmenu.lua (state = navstack,
-#             GetEntries("") = children, GetEntries(query) = global search).
-#   Walker:   dedicated Set "utilmenu" exposes ONLY that provider (see
-#             walker/config-snippet.toml). Navigation actions use ClearReload,
-#             so Walker re-queries Elephant instead of closing/reopening.
-#
-# No walker --dmenu anywhere: that path is what forced close->reopen per level
-# and stdin-only filtering until Enter. This script is just open + cache.
+# utilmenu launcher — ONE persistent Walker window.
+#   Navigation: native Elephant submenus (gen-menus.sh). Search: utilsearch.lua.
+#   Open + app-cache refresh; --preload warms cache + service without GUI.
 set -euo pipefail
 export GDK_BACKEND=wayland
 export PATH="$HOME/.local/bin:$PATH"  # elephant liegt dort (NixOS: nicht im system-PATH)

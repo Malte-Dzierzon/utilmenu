@@ -34,7 +34,6 @@ menu.conf (action|id|parent|glyph|label|handler|alias|desc)
 | Menü-Generator | `gen-menus.sh` | `~/.config/utilmenu2/gen-menus.sh` |
 | Style-Sync | `sync-style.sh` | `~/.config/utilmenu2/sync-style.sh` |
 | Search-Provider | `elephant/menus/utilsearch.lua` | `~/.config/elephant/menus/utilsearch.lua` |
-| Legacy-Engine (retired, Referenz) | `elephant/menus/utilmenu.lua` | — (nicht installieren) |
 | Walker-Set (Snippet zum Mergen) | `walker/config-snippet.toml` | `~/.config/walker/config.toml` |
 | Keybind | niri `Mod+Shift+G` → `menu.sh` | — |
 

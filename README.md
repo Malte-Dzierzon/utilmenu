@@ -48,5 +48,4 @@ Keybind: `Mod+Shift+G` → `~/.config/utilmenu2/menu.sh`.
 | `gen-menus.sh` | Generates native submenu TOMLs from `menu.conf` |
 | `sync-style.sh` | Generates Walker CSS from live Noctalia config |
 | `elephant/menus/utilsearch.lua` | Global search provider (stateless) |
-| `elephant/menus/utilmenu.lua` | Legacy single-file engine (retired, kept for reference) |
 | `walker/config-snippet.toml` | Walker set/actions to merge |
