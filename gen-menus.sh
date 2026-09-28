@@ -48,6 +48,7 @@ for cat in "${IDS[@]}"; do
     echo "Name = \"utilmenu_$cat\""
     echo "NamePretty = \"${LABEL[$cat]}\""
     echo 'FixedOrder = true'
+    echo 'Parent = "utilmenu"'
     echo '_UM_CAT = "'"$cat"'"'
     echo 'local M = dofile(os.getenv("HOME") .. "/.config/utilmenu2/elephant/submenu.lua")'
     echo 'function GetEntries(query) return M.entries(_UM_CAT, query) end'
