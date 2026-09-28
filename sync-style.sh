@@ -10,6 +10,8 @@ val() { grep -m1 -E "^\s*$1\s*=" "$SET" | sed -E 's/.*=\s*//;s/[",]//g' | awk '{
 pal() { grep -m1 -E "^$1\s*=" "$PAL" | sed -E 's/.*"(#[0-9a-fA-F]+)".*/\1/'; }
 RADIUS=$(val corner_radius_scale); RADIUS=${RADIUS:-0.0}
 BAR_OP=$(val background_opacity); BAR_OP=${BAR_OP:-0.47}
+# Menü dunkler als Bar: 1.6x opacity, max 0.95
+BAR_OP=$(python3 -c "print(min(0.95, float('$BAR_OP')*1.6))" 2>/dev/null || echo 0.75)
 FONT=$(grep -m1 -E '^\s*font_family' "$SET" | sed -E 's/.*"\s*//;s/".*//'); FONT=${FONT:-JetBrainsMono NFM}
 BASE=$(pal base); SURF=$(pal surface0); TXT=$(pal text); ACC=$(pal green); MUT=$(pal subtext0)
 BASE=${BASE:-#131314}; SURF=${SURF:-#1b1b1c}; TXT=${TXT:-#e4e2e3}; ACC=${ACC:-#bbc8d7}; MUT=${MUT:-#8e9196}
