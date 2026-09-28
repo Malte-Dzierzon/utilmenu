@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Switch zu Niri: ausloggen, dann am Login-Screen Niri wählen.
+notify-send "Window Manager: Niri" "Ausloggen — am Login-Screen 'Niri' wählen." & disown
+sleep 1
+case "${XDG_CURRENT_DESKTOP:-}" in
+  *Hyprland*) hyprctl dispatch exit & disown ;;
+  *niri*) niri msg action quit & disown ;;
+  *) loginctl terminate-user "$USER" & disown ;;
+esac

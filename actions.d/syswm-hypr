@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Switch zu Hyprland: ausloggen, dann am Login-Screen Hyprland wählen.
+notify-send "Window Manager: Hyprland" "Ausloggen — am Login-Screen 'Hyprland' wählen." & disown
+sleep 1
+case "${XDG_CURRENT_DESKTOP:-}" in
+  *niri*) niri msg action quit & disown ;;
+  *Hyprland*) hyprctl dispatch exit & disown ;;
+  *) loginctl terminate-user "$USER" & disown ;;
+esac
