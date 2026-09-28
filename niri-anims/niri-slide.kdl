@@ -1,0 +1,27 @@
+animations {
+    slowdown 2
+    window-open {
+        duration-ms 250
+        curve "ease-out-cubic"
+    }
+    window-close {
+        duration-ms 200
+        curve "ease-out-cubic"
+    }
+    workspace-switch {
+        duration-ms 300
+        curve "ease-out-cubic"
+    }
+    window-movement {
+        duration-ms 280
+        curve "ease-out-cubic"
+    }
+    horizontal-view-movement {
+        duration-ms 300
+        curve "ease-out-cubic"
+    }
+    overview-open-close {
+        duration-ms 320
+        curve "ease-out-cubic"
+    }
+}

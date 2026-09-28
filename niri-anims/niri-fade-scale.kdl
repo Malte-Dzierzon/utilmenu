@@ -1,0 +1,26 @@
+animations {
+    window-open {
+        duration-ms 220
+        curve "ease-out-expo"
+    }
+    window-close {
+        duration-ms 180
+        curve "ease-out-quad"
+    }
+    window-resize {
+        duration-ms 200
+        curve "ease-out-quad"
+    }
+    workspace-switch {
+        duration-ms 250
+        curve "ease-out-expo"
+    }
+    window-movement {
+        duration-ms 250
+        curve "ease-out-expo"
+    }
+    overview-open-close {
+        duration-ms 300
+        curve "ease-out-expo"
+    }
+}

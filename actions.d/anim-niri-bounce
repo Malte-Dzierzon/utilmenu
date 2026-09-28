@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-sleep 0.15
-"$HOME/.config/utilmenu2/niri-anims/apply.sh" "niri-bounce" & disown
