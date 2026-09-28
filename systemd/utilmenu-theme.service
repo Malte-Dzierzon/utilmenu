@@ -1,6 +1,6 @@
 [Unit]
-Description=utilmenu live theming (resync Walker CSS + recolor icons)
+Description=utilmenu live theming (resync CSS + icons, restart elephant debounced)
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c '%h/.config/utilmenu2/sync-style.sh; %h/.config/utilmenu2/recolor-icons.sh; %h/.config/utilmenu2/gen-menus.sh; /usr/bin/env PATH=%h/.local/bin:/run/current-system/sw/bin systemctl --user restart elephant'
+ExecStart=/bin/sh -c 'sleep 2; %h/.config/utilmenu2/sync-style.sh; %h/.config/utilmenu2/recolor-icons.sh; %h/.config/utilmenu2/gen-menus.sh; /usr/bin/env PATH=%h/.local/bin:/run/current-system/sw/bin systemctl --user restart elephant'

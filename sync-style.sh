@@ -16,6 +16,9 @@ BASE=${BASE:-#131314}; SURF=${SURF:-#1b1b1c}; TXT=${TXT:-#e4e2e3}; ACC=${ACC:-#b
 # radius_scale 0.0 -> eckig; sonst skaliert (Noctalia-Logik: scale * basis)
 px() { python3 -c "print(int(float('$1')*12))" 2>/dev/null || echo 0; }
 R=$(px "$RADIUS")
+HASHFILE=~/.cache/utilmenu-style.hash
+NEWHASH=$(sha256sum "$SET" "$PAL" | sha256sum | cut -d" " -f1)
+if [[ -f "$HASHFILE" && "$(cat "$HASHFILE")" == "$NEWHASH" && -f "$OUT" ]]; then echo "SYNC-SKIP: Palette unverändert"; exit 0; fi
 [[ -f "$OUT" ]] && cp "$OUT" "$OUT.bak"
 cat > "$OUT" <<EOF
 /* utilmenu — generiert aus echter Noctalia-Config. NICHT hand-editieren, sync-style.sh laufen lassen.
@@ -29,7 +32,7 @@ cat > "$OUT" <<EOF
 * { all: unset; }
 
 .box-wrapper {
-  background: alpha(@m_base, 0.97);
+  background: alpha(@m_base, $BAR_OP);
   padding: 12px;
   border-radius: ${R}px;
   border: 1px solid alpha(@m_text, 0.35);
@@ -37,7 +40,7 @@ cat > "$OUT" <<EOF
 
 .input {
   caret-color: @m_text;
-  background: alpha(@m_base, 0.9);
+  background: alpha(@m_surface, $BAR_OP);
   padding: 8px 10px;
   color: @m_text;
   border-radius: 0px;
@@ -79,4 +82,5 @@ scrollbar { opacity: 0; }
 .item-icon { margin-right: 2px; }
 .large-icons { -gtk-icon-size: 32px; }
 EOF
+echo "$NEWHASH" > "$HASHFILE"
 echo "SYNC-OK radius=${R}px font=$FONT base=$BASE accent=$ACC"

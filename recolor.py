@@ -33,6 +33,12 @@ def raster(path):
                        check=True, capture_output=True)
         return tmp, True
     return path, False
+import hashlib
+outhash = os.path.join(OUTDIR, ".srchash")
+srchash = hashlib.sha256((COLOR + open(os.path.expanduser("~/.cache/utilmenu-apps.list"), "rb").read().decode(errors="replace")).encode()).hexdigest()
+if os.path.isfile(outhash) and open(outhash).read().strip() == srchash:
+    print("RECOLOR-SKIP: unverändert")
+    sys.exit(0)
 n = 0
 for line in open(os.path.expanduser("~/.cache/utilmenu-apps.list")):
     parts = line.rstrip("\n").split("\t")
@@ -76,4 +82,5 @@ for line in open(os.path.expanduser("~/.cache/utilmenu-apps.list")):
         n += 1
         if is_tmp: os.unlink(png)
     except Exception: continue
+open(outhash, "w").write(srchash)
 print(f"RECOLORED: {n}")
