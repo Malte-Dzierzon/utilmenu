@@ -1,0 +1,45 @@
+animations {
+    // Smooth "Aufrollen": Wipe von oben mit weicher Kante + expo-Kurve.
+    window-open {
+        duration-ms 350
+        curve "ease-out-expo"
+        custom-shader r"
+            vec4 open_color(vec3 coords_geo, vec3 size_geo) {
+                if (coords_geo.x < 0.0 || coords_geo.x > 1.0 || coords_geo.y < 0.0 || coords_geo.y > 1.0)
+                    return vec4(0.0);
+                float p = niri_clamped_progress;
+                // Runde Abrollkante: Mitte eilt vor, Seiten hinken nach.
+                float x = abs(coords_geo.x - 0.5) * 2.0;
+                float round = 0.18 * (1.0 - sqrt(max(0.0, 1.0 - x * x)));
+                float edge = 0.04;
+                float mask = smoothstep(coords_geo.y + round - edge, coords_geo.y + round, p);
+                vec3 coords_tex = niri_geo_to_tex * coords_geo;
+                vec4 color = texture2D(niri_tex, coords_tex.st);
+                return color * mask;
+            }
+        "
+    }
+    window-close {
+        duration-ms 250
+        curve "ease-out-expo"
+        custom-shader r"
+            vec4 close_color(vec3 coords_geo, vec3 size_geo) {
+                if (coords_geo.x < 0.0 || coords_geo.x > 1.0 || coords_geo.y < 0.0 || coords_geo.y > 1.0)
+                    return vec4(0.0);
+                float p = 1.0 - niri_clamped_progress;
+                float x = abs(coords_geo.x - 0.5) * 2.0;
+                float round = 0.18 * (1.0 - sqrt(max(0.0, 1.0 - x * x)));
+                float edge = 0.04;
+                float mask = smoothstep(coords_geo.y + round - edge, coords_geo.y + round, p);
+                vec3 coords_tex = niri_geo_to_tex * coords_geo;
+                vec4 color = texture2D(niri_tex, coords_tex.st);
+                return color * mask;
+            }
+        "
+    }
+    horizontal-view-movement { spring damping-ratio=1.0 stiffness=700 epsilon=0.0001; }
+    window-movement { spring damping-ratio=1.0 stiffness=700 epsilon=0.0001; }
+    window-resize { spring damping-ratio=1.0 stiffness=700 epsilon=0.0001; }
+    workspace-switch { spring damping-ratio=1.0 stiffness=800 epsilon=0.0001; }
+    overview-open-close { spring damping-ratio=1.0 stiffness=800 epsilon=0.0001; }
+}
