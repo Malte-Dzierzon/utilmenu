@@ -23,4 +23,4 @@ height = 540
 placement = "floating"
 position = "center"
 keyboard_focus = "exclusive"
-capture_keys = ["escape", "up", "down", "enter", "backspace"]
+capture_keys = ["escape", "up", "down", "enter"]

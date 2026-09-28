@@ -1,11 +1,12 @@
--- utilmenu panel v2: Query-Reset, Tabler-Icons, Recolor-App-Icons, Theme-Radius.
--- Flow: root -> Drill-in (Klick/Enter) -> Esc/Backspace raus -> Suche global, Reset bei jedem Open.
+-- utilmenu panel v3: Suche IMMER global (wie Referenz), Navigation nur bei leerer Query.
+-- Keine capture_keys für editier-Tasten (Backspace/Arrows gehören dem Input).
+-- Hover via onHover-State statt Voll-Rebuild; Icons mit fester Box + Gap.
 
 local CONF = (noctalia.getenv("HOME") or "") .. "/.config/utilmenu2/"
 local CACHE = (noctalia.getenv("HOME") or "") .. "/.cache/utilmenu-apps.list"
 local ICONDIR = (noctalia.getenv("HOME") or "") .. "/.cache/utilmenu-icons/"
 
-local state = { path = {}, query = "", selected = 1, items = {}, menu = {}, apps = {} }
+local state = { path = {}, query = "", selected = 1, hover = 0, items = {}, menu = {}, apps = {} }
 
 local function split(s, sep)
   local out, i, from = {}, 1, 1
@@ -47,10 +48,8 @@ local function load_menu()
   state.menu = items
 end
 
--- Recolor-PNG zum App-Namen (gleiche Safe-Regel wie recolored() im alten Lua)
 local function recolor_path(name)
-  local safe = name:gsub("[^%w]", "_"):sub(1, 40)
-  return ICONDIR .. safe .. ".png"
+  return ICONDIR .. name:gsub("[^%w]", "_"):sub(1, 40) .. ".png"
 end
 
 local function load_apps()
@@ -61,9 +60,8 @@ local function load_apps()
     local p = split(line, "\t")
     if #p >= 4 and p[2] ~= "" and p[3] ~= "" then
       local png = recolor_path(p[2])
-      local has_png = noctalia.readFile(png) ~= nil
       table.insert(items, { name = p[2], file = p[3], icon = p[4],
-        png = has_png and png or nil })
+        png = (noctalia.readFile(png) ~= nil) and png or nil })
     end
   end
   state.apps = items
@@ -81,11 +79,12 @@ local function find_menu(id)
   return nil
 end
 
+-- Referenz-Logik: Query leer -> Kategorie-Inhalt; Query gesetzt -> GLOBAL über alles.
 local function rebuild()
   local out = {}
   local q = state.query:lower()
-  local cat = cur_cat()
   if q == "" then
+    local cat = cur_cat()
     for _, e in ipairs(state.menu) do
       if e.parent == cat then
         local h = e.handler or ""
@@ -102,16 +101,18 @@ local function rebuild()
       end
     end
   else
+    -- global: Menü-Einträge (parent != root) + Apps, mit Breadcrumb als desc
     for _, e in ipairs(state.menu) do
-      if e.parent ~= "root" and (cat == "root" or e.parent == cat) then
+      if e.parent ~= "root" then
         local s = noctalia.fuzzyScore(q, e.label)
         if s ~= nil then
           local h = e.handler or ""
           local is_sub = h:sub(1, 8) == "submenu:"
+          local pe = find_menu(e.parent)
           table.insert(out, { id = "m:" .. e.id,
             label = e.label .. (is_sub and " ›" or ""),
-            ticon = e.icon, desc = e.desc, kind = is_sub and "cat" or "run",
-            data = e, score = s })
+            ticon = e.icon, desc = pe and pe.label or e.desc,
+            kind = is_sub and "cat" or "run", data = e, score = s })
         end
       end
     end
@@ -119,13 +120,19 @@ local function rebuild()
       local s = noctalia.fuzzyScore(q, a.name)
       if s ~= nil then
         table.insert(out, { id = "a:" .. a.file, label = a.name,
-          png = a.png, appicon = a.icon, kind = "app", data = a, score = s })
+          png = a.png, appicon = a.icon, desc = "Apps",
+          kind = "app", data = a, score = s })
       end
     end
     table.sort(out, function(x, y) return (x.score or 0) > (y.score or 0) end)
+    if #out == 0 then
+      table.insert(out, { id = "__noresults", label = "No match for '" .. state.query .. "'",
+        desc = "keep typing or press Esc", kind = "none" })
+    end
   end
   state.items = out
   if state.selected > #out then state.selected = math.max(1, #out) end
+  if state.selected < 1 then state.selected = 1 end
 end
 
 local function breadcrumb()
@@ -138,17 +145,17 @@ local function breadcrumb()
   return table.concat(names, " › ")
 end
 
--- Icon-Widget: Recolor-PNG > Theme-Icon-Name > Tabler-Char-Label > Fallback-Glyphe
-local function icon_widget(it, sel)
-  local fg = sel and "on_primary" or "on_surface"
+local function icon_widget(it, active)
+  local fg = active and "on_primary" or "on_surface"
   if it.png then
     return ui.image({ path = it.png, width = 22, height = 22 })
   end
+  -- kein Wrapper: Row hat gap=12, Label trägt das Icon direkt (vertikal via paddingV der Row)
   if it.appicon and it.appicon ~= "" then
-    return ui.glyph({ name = it.appicon, size = 18, color = fg })
+    return ui.label({ text = "▢ ", fontSize = 18, color = fg })
   end
   if it.ticon and it.ticon ~= "" then
-    return ui.label({ text = it.ticon, fontSize = 17, color = fg })
+    return ui.label({ text = it.ticon .. " ", fontSize = 17, color = fg })
   end
   return ui.glyph({ name = "settings", size = 16, color = fg })
 end
@@ -157,18 +164,18 @@ function render()
   rebuild()
   local rows = {}
   for i, it in ipairs(state.items) do
-    local sel = (i == state.selected)
+    local active = (i == state.selected or i == state.hover)
     rows[#rows + 1] = ui.row(
-      { fill = sel and "primary" or "transparent",
-        paddingH = 10, paddingV = 7, radius = 8,
-        onClick = "onRowClick:" .. it.id },
+      { fill = active and "primary" or "transparent",
+        paddingH = 10, paddingV = 8, radius = 8, gap = 12,
+        onClick = "onRowClick:" .. it.id, onHover = "onRowHover:" .. i },
       {
-        icon_widget(it, sel),
-        ui.column({ gap = 0 }, {
+        icon_widget(it, active),
+        ui.column({ gap = 2 }, {
           ui.label({ text = it.label, fontSize = 14,
-            color = sel and "on_primary" or "on_surface" }),
+            color = active and "on_primary" or "on_surface" }),
           it.desc and it.desc ~= "" and ui.label({ text = it.desc, fontSize = 11,
-            color = sel and "on_primary/0.7" or "on_surface_variant" }) or nil,
+            color = active and "on_primary/0.7" or "on_surface_variant" }) or nil,
         }),
       })
     if #rows >= 12 then break end
@@ -182,10 +189,10 @@ function render()
 end
 
 function onOpen()
-  -- harter Reset bei jedem Öffnen (Query, Pfad, Selektion)
   state.path = {}
   state.query = ""
   state.selected = 1
+  state.hover = 0
   load_menu()
   load_apps()
   noctalia.runAsync({ "bash", CONF .. "refresh-apps.sh" }, function(r)
@@ -195,31 +202,38 @@ function onOpen()
 end
 
 function onClose()
-  -- Reset auch beim Schließen, damit kein State überlebt
   state.path = {}
   state.query = ""
   state.selected = 1
+  state.hover = 0
 end
 
 function onSearch(text)
   state.query = text or ""
   state.selected = 1
+  state.hover = 0
   render()
 end
 
 function onSubmit()
   local it = state.items[state.selected]
-  if it then activate(it) end
+  if it and it.kind ~= "none" then activate(it) end
 end
 
 function onRowClick(id)
   for i, it in ipairs(state.items) do
     if it.id == id then
       state.selected = i
-      activate(it)
+      if it.kind ~= "none" then activate(it) end
       return
     end
   end
+end
+
+function onRowHover(idx)
+  -- Hover markiert nur (kein Rebuild, kein Selektions-Folgen)
+  state.hover = tonumber(idx) or 0
+  render()
 end
 
 function activate(it)
@@ -227,6 +241,7 @@ function activate(it)
     table.insert(state.path, it.data.id)
     state.query = ""
     state.selected = 1
+    state.hover = 0
     render()
     return
   end
@@ -242,6 +257,7 @@ function activate(it)
     panel.close()
     return
   end
+  if it.kind == "none" then return end
   local h = it.data.handler or ""
   local run_id = h:sub(1, 4) == "run:" and h:sub(5) or it.data.id
   if run_id ~= "" and not run_id:find("/") then
@@ -252,23 +268,23 @@ end
 
 function onKey(chord, pressed)
   if not pressed then return end
+  -- NUR Navigation (keine Edit-Tasten: die gehören dem Input)
   if chord == "escape" then
     if #state.path > 0 and state.query == "" then
       table.remove(state.path)
       state.selected = 1
+      state.hover = 0
       render()
     else
       panel.close()
     end
-  elseif chord == "backspace" and state.query == "" and #state.path > 0 then
-    table.remove(state.path)
-    state.selected = 1
-    render()
   elseif chord == "down" then
     state.selected = math.min(state.selected + 1, #state.items)
+    state.hover = 0
     render()
   elseif chord == "up" then
     state.selected = math.max(state.selected - 1, 1)
+    state.hover = 0
     render()
   elseif chord == "enter" then
     onSubmit()
