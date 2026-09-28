@@ -29,7 +29,7 @@ entry_for() { # $1 = id -> TOML-Block
   local id="$1" ic
   ic="$(hexchar "${HEX[$id]:-0}")"
   if is_cat "$id"; then
-    printf '[[entries]]\ntext = "%s"\nicon = "%s"\nsubmenu = "utilmenu_%s"\n' "${LABEL[$id]}" "$ic" "$id"
+    printf '[[entries]]\ntext = "%s"\nicon = "%s"\nsubtext = "›"\nsubmenu = "utilmenu_%s"\n' "${LABEL[$id]}" "$ic" "$id"
   else
     local act="${HANDLER[$id]#run:}"
     printf '[[entries]]\ntext = "%s"\nicon = "%s"\nactions = { default = "bash $HOME/.config/utilmenu2/actions.d/%s" }\n' "${LABEL[$id]}" "$ic" "$act"
