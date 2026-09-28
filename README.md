@@ -1,51 +1,62 @@
 # utilmenu
 
-Omarchy-style category menu for NixOS (Niri). One persistent Walker window,
-native Elephant submenus, global live search, Noctalia-derived styling.
-
-## How it works
-
-```text
-menu.conf (action|id|parent|glyph|label|handler|alias|desc)
-  ├── gen-menus.sh → native TOML menus (navigation)
-  └── utilsearch.lua → global search provider (search only)
-```
-
-- **Navigation (native):** each category is its own Elephant menu,
-  entries use `submenu = "utilmenu_<id>"`. Walker `menus:open` navigates
-  in place (`ClearReload`), same window, no reopen.
-- **Search (stateless):** `menus:utilsearch` sees the whole `menu.conf`
-  plus the desktop-app cache. Empty query → no results (navigation shows).
-  Non-empty → global matches with breadcrumb subtext, no Enter needed.
-- **Styling:** `sync-style.sh` reads the real Noctalia config
-  (`settings.toml` + wallpaper palette) into the Walker CSS.
-  Noctalia itself is never modified.
+Category menu for NixOS (Niri + Walker + Elephant). One persistent window,
+native submenu navigation, global live search, Noctalia-derived styling.
 
 ## Install
 
 ```sh
-DEST=~/.config/utilmenu2
-mkdir -p "$DEST/actions.d" ~/.config/elephant/menus
-cp menu.sh menu.conf menu.conf.sh gen-menus.sh sync-style.sh "$DEST/"
-cp actions.d/* "$DEST/actions.d/"
-cp elephant/menus/utilsearch.lua ~/.config/elephant/menus/utilsearch.lua
-~/.config/utilmenu2/gen-menus.sh   # generates native TOMLs into elephant/menus/
-~/.config/utilmenu2/sync-style.sh  # generates Walker CSS from Noctalia config
-# merge walker/config-snippet.toml into ~/.config/walker/config.toml
+git clone <repo> ~/.config/utilmenu2   # or wherever you keep it
+cd ~/.config/utilmenu2
+./install.sh                 # full install incl. services
+./install.sh --no-services   # files only, no systemd units
+./install.sh --keybind       # + print suggested niri keybind
 ```
 
-Requires: `walker` + `elephant` (menus provider) running.
-Keybind: `Mod+Shift+G` → `~/.config/utilmenu2/menu.sh`.
+Requirements: `walker`, `elephant` (menus provider), `foot` for TUI apps.
+On NixOS: add `walker` + `elephant` to `environment.systemPackages`.
+
+What it does (all user-scope, nothing global):
+- copies scripts/conf/actions to `~/.config/utilmenu2/`
+- installs `utilsearch.lua` to `~/.config/elephant/menus/`
+- generates submenu files via `gen-menus.sh`
+- syncs Walker CSS from Noctalia config via `sync-style.sh`
+- recolours app icons via `recolor-icons.sh`
+- tells you what to merge into `~/.config/walker/config.toml`
+- enables `utilmenu-preload.service` (cold-start cache, no GUI)
+  and `utilmenu-theme.path` (live re-theme on wallpaper change)
+
+The installer never overwrites your walker config — it prints what to merge.
+
+## How it works
+
+```text
+menu.conf ─┬─ gen-menus.sh ─→ utilmenu.toml (root) + utilmenu_<cat>.lua (submenus)
+           └─ utilsearch.lua (global search provider, stateless)
+```
+
+- **Root** (`menus:utilmenu`, TOML): the 8 categories.
+- **Submenus** (Lua, generated): empty query → own children;
+  any query → global search over all of `menu.conf` + desktop apps.
+  Navigation is native (`SubMenu` field + `menus:open`), same window.
+- **Search** (`menus:utilsearch`): same global logic at root level.
+- **Styling** follows the active Noctalia wallpaper palette
+  (`settings.toml` + generated M3 palette). Noctalia is never modified.
+- **App icons** are recoloured to Noctalia's `app_icon_color` role.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `menu.sh` | Launcher (open + app-cache refresh) |
-| `menu.conf` | The dataset (labels, order, icons, handlers) |
-| `menu.conf.sh` | Geometry/theme/cache paths |
-| `actions.d/*` | One script per `run:<id>` |
-| `gen-menus.sh` | Generates native submenu TOMLs from `menu.conf` |
-| `sync-style.sh` | Generates Walker CSS from live Noctalia config |
-| `elephant/menus/utilsearch.lua` | Global search provider (stateless) |
-| `walker/config-snippet.toml` | Walker set/actions to merge |
+| `install.sh` | installer (this) |
+| `menu.sh` | launcher (`--preload` warms cache + service) |
+| `menu.conf` | the dataset (labels, order, icons, handlers) |
+| `menu.conf.sh` | geometry/theme/cache paths |
+| `actions.d/*` | one script per `run:<id>` |
+| `gen-menus.sh` | generates root TOML + submenu Lua files |
+| `sync-style.sh` | Walker CSS from live Noctalia config |
+| `recolor-icons.sh` / `recolor.py` | app icons → Noctalia accent colour |
+| `elephant/submenu.lua` | shared submenu logic (children + global search) |
+| `elephant/menus/utilsearch.lua` | root-level global search provider |
+| `walker/config-snippet.toml` | set/actions to merge into walker config |
+| `systemd/` | preload service + theme watcher units |
