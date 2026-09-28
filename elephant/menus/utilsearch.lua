@@ -131,7 +131,7 @@ function GetEntries(query)
   if #out == 0 then
     local dt = (#q == 1) and q or ("No match for '" .. q .. "'")
     return { { Text = dt, Subtext = "keep typing or press Esc",
-      Value = "__noresults" } }
+      Value = "__noresults", Actions = { default = "lua:UtilSearchRun" } } }
   end
   return out
 end

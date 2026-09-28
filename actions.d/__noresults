@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# No-op für No-match-Dummy (hält Walker offen)
+exit 0
