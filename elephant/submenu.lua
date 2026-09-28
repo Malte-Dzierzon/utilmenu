@@ -103,9 +103,39 @@ local function child_entry(e, ds)
     Actions = { default = "lua:UtilSubRun" } }
 end
 
+local function refresh_apps()
+  -- Live-Refresh: Dir-mtime oder .desktop-Count vs Cache -> refresh-apps.sh (async).
+  local cache = cache_file()
+  local function mtime(p)
+    local h = io.popen("stat -c %Y '" .. p:gsub("'", "'\\''") .. "' 2>/dev/null")
+    if h == nil then return 0 end
+    local t = tonumber(trim(h:read('*a') or '0')) or 0; h:close(); return t
+  end
+  local cm = mtime(cache)
+  if cm == 0 then return end
+  local stale = false
+  local dh = io.popen("ls -d ~/.local/share/applications /run/current-system/sw/share/applications ~/.nix-profile/share/applications /usr/share/applications 2>/dev/null")
+  if dh ~= nil then
+    for d in dh:lines() do if mtime(d) > cm then stale = true; break end end
+    dh:close()
+  end
+  if not stale then
+    local nh = io.popen("ls ~/.local/share/applications/*.desktop /run/current-system/sw/share/applications/*.desktop ~/.nix-profile/share/applications/*.desktop /usr/share/applications/*.desktop 2>/dev/null | wc -l")
+    local ncount = 0
+    if nh ~= nil then ncount = tonumber(trim(nh:read('*a') or '0')) or 0; nh:close() end
+    local ch = io.popen("wc -l < '" .. cache:gsub("'", "'\\''") .. "' 2>/dev/null")
+    local ccount = -1
+    if ch ~= nil then ccount = tonumber(trim(ch:read('*a') or '-1')) or -1; ch:close() end
+    if ncount == ccount then return end
+  end
+  os.execute("setsid bash '" .. base_dir() .. "/refresh-apps.sh' >/dev/null 2>&1 &")
+end
+
+M.refresh_apps = refresh_apps
+
 function M.entries(cat, query)
+  if cat == "apps" or (query or "") ~= "" then pcall(refresh_apps) end
   local ds = load_dataset()
-  if ds == nil then return {} end
   local q = trim(query or "")
   if q == "" then
     local out = {}

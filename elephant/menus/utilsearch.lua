@@ -88,6 +88,10 @@ end
 function GetEntries(query)
   local q = trim(query)
   if q == "" then return {} end
+  pcall(function()
+    local ok, sub = pcall(dofile, (os.getenv("HOME") or "") .. "/.config/utilmenu2/elephant/submenu.lua")
+    if ok and sub ~= nil and sub.refresh_apps ~= nil then pcall(sub.refresh_apps) end
+  end)
   local ds = load_dataset()
   if ds.err ~= nil then return {} end
   local ql = q:lower()
