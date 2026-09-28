@@ -163,6 +163,10 @@ function M.entries(cat, query)
     end
     fh:close()
   end
+  if #out == 0 then
+    return { { Text = "No match for '" .. q .. "'", Subtext = "keep typing or press Esc",
+      Value = "__noresults" } }
+  end
   return out
 end
 
