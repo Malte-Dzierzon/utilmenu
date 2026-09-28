@@ -154,13 +154,20 @@ function UtilSearchLaunch(value, args, query)
   local bin, args = line:match("^(%S+)%s*(.*)$")
   if bin == nil or bin == "" then return end
   local function shq(s) return "'" .. s:gsub("'", "'\\''") .. "'" end
+  local wdisp = os.getenv("WAYLAND_DISPLAY")
+  if wdisp == nil or wdisp == "" then
+    local wl = io.popen("ls -t /run/user/$(id -u)/wayland-* 2>/dev/null | grep -v lock | head -1")
+    if wl ~= nil then wdisp = trim(wl:read('*a') or ''); wl:close() end
+    if wdisp ~= nil and wdisp ~= '' then wdisp = wdisp:match('([^/]+)$') end
+  end
+  local wenv = (wdisp ~= nil and wdisp ~= '') and ("WAYLAND_DISPLAY='" .. wdisp .. "' ") or ""
   if is_tui then
     local te = os.getenv("TERM_EMULATOR") or "foot"
-    os.execute("setsid " .. te .. " " .. bin:gsub("'", "'\\''") .. (args ~= "" and " " .. args or "") .. " >/dev/null 2>&1 &")
+    os.execute("setsid env " .. wenv .. te .. " " .. bin:gsub("'", "'\\''") .. (args ~= "" and " " .. args or "") .. " >/dev/null 2>&1 &")
   elseif args ~= "" and bin:find("foot", 1, true) then
     -- Exec bringt sein eigenes foot mit (tui-*.desktop): direkt starten
-    os.execute("setsid " .. bin:gsub("'", "'\\''") .. " " .. args .. " >/dev/null 2>&1 &")
+    os.execute("setsid env " .. wenv .. bin:gsub("'", "'\\''") .. " " .. args .. " >/dev/null 2>&1 &")
   else
-    os.execute("setsid " .. shq(bin) .. (args ~= "" and " " .. args or "") .. " >/dev/null 2>&1 &")
+    os.execute("setsid env " .. wenv .. shq(bin) .. (args ~= "" and " " .. args or "") .. " >/dev/null 2>&1 &")
   end
 end
