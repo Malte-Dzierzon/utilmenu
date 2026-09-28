@@ -129,7 +129,8 @@ function GetEntries(query)
     fh:close()
   end
   if #out == 0 then
-    return { { Text = "No match for '" .. q .. "'", Subtext = "keep typing or press Esc",
+    local dt = (#q == 1) and q or ("No match for '" .. q .. "'")
+    return { { Text = dt, Subtext = "keep typing or press Esc",
       Value = "__noresults" } }
   end
   return out
