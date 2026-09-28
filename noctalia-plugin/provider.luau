@@ -100,28 +100,30 @@ local function cat_results(cat, q, query_text)
   for _, e in ipairs(menu_items) do
     if e.parent == cat then
       local s = 1
+      local skip = false
       if q ~= "" then
         local fs = noctalia.fuzzyScore(q, e.label)
-        if fs == nil then goto continue end
-        s = fs
+        if fs == nil then skip = true else s = fs end
       end
-      table.insert(out, menu_result(e, s))
-      if #out >= 50 then break end
+      if not skip then
+        table.insert(out, menu_result(e, s))
+        if #out >= 50 then break end
+      end
     end
-    ::continue::
   end
   if cat == "apps" then
     for _, a in ipairs(app_items) do
       local s = 1
+      local skip = false
       if q ~= "" then
         local fs = noctalia.fuzzyScore(q, a.name)
-        if fs == nil then goto continue2 end
-        s = fs
+        if fs == nil then skip = true else s = fs end
       end
-      table.insert(out, app_result(a, s))
-      if #out >= 50 then break end
+      if not skip then
+        table.insert(out, app_result(a, s))
+        if #out >= 50 then break end
+      end
     end
-    ::continue2::
   end
   launcher.setResults(query_text, out)
 end
