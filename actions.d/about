@@ -1,1 +1,4 @@
-setsid foot -a float-term bash -lc 'fastfetch; read -rp "Press Enter to close " _' & disown
+#!/usr/bin/env bash
+# About: fastfetch in foot (mit WAYLAND_DISPLAY für Hyprland).
+WD=$(ls -t "$XDG_RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v lock | head -1); WD=${WD##*/}
+setsid env WAYLAND_DISPLAY="$WD" foot -a float-term bash -lc 'fastfetch; read -rp "Press Enter to close " _' & disown

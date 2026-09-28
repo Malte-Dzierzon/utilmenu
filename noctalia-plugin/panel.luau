@@ -1,17 +1,11 @@
--- utilmenu panel: eigenes Fenster in Launcher-Optik, Walker-Navigation, Luau-Speed.
--- Flow: root-Kategorien -> rein (Drill-in) -> raus (Backspace/Esc) -> Suche global.
+-- utilmenu panel v2: Query-Reset, Tabler-Icons, Recolor-App-Icons, Theme-Radius.
+-- Flow: root -> Drill-in (Klick/Enter) -> Esc/Backspace raus -> Suche global, Reset bei jedem Open.
 
 local CONF = (noctalia.getenv("HOME") or "") .. "/.config/utilmenu2/"
 local CACHE = (noctalia.getenv("HOME") or "") .. "/.cache/utilmenu-apps.list"
+local ICONDIR = (noctalia.getenv("HOME") or "") .. "/.cache/utilmenu-icons/"
 
-local state = {
-  path = {},      -- Kategorie-Pfad (ids), {} = root
-  query = "",
-  selected = 1,
-  items = {},     -- aktuelle Ergebnisliste {id,label,icon,desc,kind,data}
-  menu = {},      -- menu.conf-Einträge
-  apps = {},
-}
+local state = { path = {}, query = "", selected = 1, items = {}, menu = {}, apps = {} }
 
 local function split(s, sep)
   local out, i, from = {}, 1, 1
@@ -53,6 +47,12 @@ local function load_menu()
   state.menu = items
 end
 
+-- Recolor-PNG zum App-Namen (gleiche Safe-Regel wie recolored() im alten Lua)
+local function recolor_path(name)
+  local safe = name:gsub("[^%w]", "_"):sub(1, 40)
+  return ICONDIR .. safe .. ".png"
+end
+
 local function load_apps()
   local txt = noctalia.readFile(CACHE)
   if not txt then return end
@@ -60,7 +60,10 @@ local function load_apps()
   for line in (txt .. "\n"):gmatch("([^\n]*)\n") do
     local p = split(line, "\t")
     if #p >= 4 and p[2] ~= "" and p[3] ~= "" then
-      table.insert(items, { name = p[2], file = p[3], icon = p[4] })
+      local png = recolor_path(p[2])
+      local has_png = noctalia.readFile(png) ~= nil
+      table.insert(items, { name = p[2], file = p[3], icon = p[4],
+        png = has_png and png or nil })
     end
   end
   state.apps = items
@@ -78,32 +81,27 @@ local function find_menu(id)
   return nil
 end
 
--- Ergebnisliste aufbauen: Navigation (Kategorie-Inhalt) + globale Suche
 local function rebuild()
   local out = {}
   local q = state.query:lower()
   local cat = cur_cat()
   if q == "" then
-    -- Navigation: Kinder der aktuellen Kategorie
     for _, e in ipairs(state.menu) do
       if e.parent == cat then
         local h = e.handler or ""
         local is_sub = h:sub(1, 8) == "submenu:"
-        table.insert(out, {
-          id = "m:" .. e.id, label = e.label .. (is_sub and " ›" or ""),
-          icon = e.icon, desc = e.desc, kind = is_sub and "cat" or "run",
-          data = e,
-        })
+        table.insert(out, { id = "m:" .. e.id,
+          label = e.label .. (is_sub and " ›" or ""),
+          ticon = e.icon, desc = e.desc, kind = is_sub and "cat" or "run", data = e })
       end
     end
     if cat == "apps" then
       for _, a in ipairs(state.apps) do
-        table.insert(out, { id = "a:" .. a.file, label = a.name, icon = nil,
-          appicon = a.icon, desc = nil, kind = "app", data = a })
+        table.insert(out, { id = "a:" .. a.file, label = a.name,
+          png = a.png, appicon = a.icon, kind = "app", data = a })
       end
     end
   else
-    -- Globale Suche über alles (Menü + Apps), Kategorie-Filter wenn drin
     for _, e in ipairs(state.menu) do
       if e.parent ~= "root" and (cat == "root" or e.parent == cat) then
         local s = noctalia.fuzzyScore(q, e.label)
@@ -112,7 +110,7 @@ local function rebuild()
           local is_sub = h:sub(1, 8) == "submenu:"
           table.insert(out, { id = "m:" .. e.id,
             label = e.label .. (is_sub and " ›" or ""),
-            icon = e.icon, desc = e.desc, kind = is_sub and "cat" or "run",
+            ticon = e.icon, desc = e.desc, kind = is_sub and "cat" or "run",
             data = e, score = s })
         end
       end
@@ -120,8 +118,8 @@ local function rebuild()
     for _, a in ipairs(state.apps) do
       local s = noctalia.fuzzyScore(q, a.name)
       if s ~= nil then
-        table.insert(out, { id = "a:" .. a.file, label = a.name, icon = nil,
-          appicon = a.icon, desc = nil, kind = "app", data = a, score = s })
+        table.insert(out, { id = "a:" .. a.file, label = a.name,
+          png = a.png, appicon = a.icon, kind = "app", data = a, score = s })
       end
     end
     table.sort(out, function(x, y) return (x.score or 0) > (y.score or 0) end)
@@ -140,19 +138,32 @@ local function breadcrumb()
   return table.concat(names, " › ")
 end
 
+-- Icon-Widget: Recolor-PNG > Theme-Icon-Name > Tabler-Char-Label > Fallback-Glyphe
+local function icon_widget(it, sel)
+  local fg = sel and "on_primary" or "on_surface"
+  if it.png then
+    return ui.image({ path = it.png, width = 22, height = 22 })
+  end
+  if it.appicon and it.appicon ~= "" then
+    return ui.glyph({ name = it.appicon, size = 18, color = fg })
+  end
+  if it.ticon and it.ticon ~= "" then
+    return ui.label({ text = it.ticon, fontSize = 17, color = fg })
+  end
+  return ui.glyph({ name = "settings", size = 16, color = fg })
+end
+
 function render()
   rebuild()
   local rows = {}
   for i, it in ipairs(state.items) do
     local sel = (i == state.selected)
     rows[#rows + 1] = ui.row(
-      { fill = sel and "primary" or "surface_variant/0.0",
+      { fill = sel and "primary" or "transparent",
         paddingH = 10, paddingV = 7, radius = 8,
         onClick = "onRowClick:" .. it.id },
       {
-        it.appicon and ui.image({ path = it.appicon, width = 20, height = 20 })
-          or ui.glyph({ name = "settings", size = 16,
-            color = sel and "on_primary" or "on_surface" }),
+        icon_widget(it, sel),
         ui.column({ gap = 0 }, {
           ui.label({ text = it.label, fontSize = 14,
             color = sel and "on_primary" or "on_surface" }),
@@ -164,13 +175,14 @@ function render()
   end
   panel.render(ui.column({ gap = 8, padding = 12 }, {
     ui.label({ text = breadcrumb(), fontSize = 11, color = "on_surface_variant" }),
-    ui.input({ value = state.query, placeholder = "Search",
+    ui.input({ value = "", placeholder = "Search",
       focus = true, onChange = "onSearch", onSubmit = "onSubmit" }),
     ui.scroll({}, rows),
   }))
 end
 
 function onOpen()
+  -- harter Reset bei jedem Öffnen (Query, Pfad, Selektion)
   state.path = {}
   state.query = ""
   state.selected = 1
@@ -182,7 +194,12 @@ function onOpen()
   render()
 end
 
-function onClose() end
+function onClose()
+  -- Reset auch beim Schließen, damit kein State überlebt
+  state.path = {}
+  state.query = ""
+  state.selected = 1
+end
 
 function onSearch(text)
   state.query = text or ""
@@ -225,7 +242,6 @@ function activate(it)
     panel.close()
     return
   end
-  -- run: Aktion aus actions.d
   local h = it.data.handler or ""
   local run_id = h:sub(1, 4) == "run:" and h:sub(5) or it.data.id
   if run_id ~= "" and not run_id:find("/") then
@@ -238,7 +254,6 @@ function onKey(chord, pressed)
   if not pressed then return end
   if chord == "escape" then
     if #state.path > 0 and state.query == "" then
-      -- raus aus Kategorie
       table.remove(state.path)
       state.selected = 1
       render()
@@ -257,11 +272,5 @@ function onKey(chord, pressed)
     render()
   elseif chord == "enter" then
     onSubmit()
-  end
-end
-
-function onIpc(event, payload)
-  if event == "open" then
-    noctalia.runAsync({ "true" })
   end
 end
