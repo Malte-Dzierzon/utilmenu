@@ -21,7 +21,7 @@ vec4 open_color(vec3 coords_geo, vec3 size_geo) {
     wobbly_uv.y += cos(fluid_uv.x) * 0.06 * settle_curve;
     vec2 pixel_pos = (wobbly_uv - 0.5) * size_geo.xy;
     vec2 box_size = (size_geo.xy * 0.5) * (p * 1.15);
-    float corner_radius = 16.0;
+    float corner_radius = 0.0;
     float radius = min(corner_radius, min(box_size.x, box_size.y));
     vec2 q = abs(pixel_pos) - box_size + vec2(radius);
     float dist = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;
@@ -61,7 +61,7 @@ vec4 close_color(vec3 coords_geo, vec3 size_geo) {
     wobbly_uv.y += cos(fluid_uv.x) * 0.06 * settle_curve;
     vec2 pixel_pos = (wobbly_uv - 0.5) * size_geo.xy;
     vec2 box_size = (size_geo.xy * 0.5) * (p * 1.15);
-    float corner_radius = 16.0;
+    float corner_radius = 0.0;
     float radius = min(corner_radius, min(box_size.x, box_size.y));
     vec2 q = abs(pixel_pos) - box_size + vec2(radius);
     float dist = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;

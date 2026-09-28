@@ -19,7 +19,7 @@ animations {
             vec2 ball_box_size = vec2(min_dim * 0.5);
             vec2 current_box_size = mix(ball_box_size, target_box_size, p);
             float ball_radius = min_dim * 0.5;
-            float current_radius = mix(ball_radius, 12.0, p);
+            float current_radius = mix(ball_radius, 0.0, p);
             vec2 pixel_pos = centered * size_geo.xy;
             float radius = min(current_radius, min(current_box_size.x, current_box_size.y));
             vec2 q = abs(pixel_pos) - current_box_size + vec2(radius);
@@ -51,7 +51,7 @@ animations {
             vec2 ball_box_size = vec2(min_dim * 0.5);
             vec2 current_box_size = mix(ball_box_size, target_box_size, p);
             float ball_radius = min_dim * 0.5;
-            float current_radius = mix(ball_radius, 12.0, p);
+            float current_radius = mix(ball_radius, 0.0, p);
             vec2 pixel_pos = centered * size_geo.xy;
             float radius = min(current_radius, min(current_box_size.x, current_box_size.y));
             vec2 q = abs(pixel_pos) - current_box_size + vec2(radius);

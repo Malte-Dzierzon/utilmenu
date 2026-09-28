@@ -15,7 +15,7 @@ animations {
             vec2 tex_uv = centered + 0.5;
             vec3 coords_tex = niri_geo_to_tex * vec3(tex_uv, coords_geo.z);
             vec4 oColor = texture2D(niri_tex, coords_tex.st);
-            float corner_radius = 12.0;
+            float corner_radius = 0.0;
             vec2 pixel_pos = centered * size_geo.xy;
             vec2 box_size = size_geo.xy * 0.5;
             float radius = min(corner_radius, min(box_size.x, box_size.y));
@@ -43,7 +43,7 @@ animations {
             vec2 tex_uv = centered + 0.5;
             vec3 coords_tex = niri_geo_to_tex * vec3(tex_uv, coords_geo.z);
             vec4 oColor = texture2D(niri_tex, coords_tex.st);
-            float corner_radius = 12.0;
+            float corner_radius = 0.0;
             vec2 pixel_pos = centered * size_geo.xy;
             vec2 box_size = size_geo.xy * 0.5;
             float radius = min(corner_radius, min(box_size.x, box_size.y));
