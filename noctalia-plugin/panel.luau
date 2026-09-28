@@ -182,7 +182,7 @@ function render()
   end
   panel.render(ui.column({ gap = 8, padding = 12 }, {
     ui.label({ text = breadcrumb(), fontSize = 11, color = "on_surface_variant" }),
-    ui.input({ value = "", placeholder = "Search",
+    ui.input({ value = state.query, placeholder = "Search",
       focus = true, onChange = "onSearch", onSubmit = "onSubmit" }),
     ui.scroll({}, rows),
   }))
@@ -231,9 +231,13 @@ function onRowClick(id)
 end
 
 function onRowHover(idx)
-  -- Hover markiert nur (kein Rebuild, kein Selektions-Folgen)
-  state.hover = tonumber(idx) or 0
-  render()
+  -- Hover folgt der Selektion OHNE Rebuild (kein Hover-Stau, kein Flackern)
+  local n = tonumber(idx) or 0
+  if n >= 1 and n <= #state.items and n ~= state.selected then
+    state.selected = n
+    state.hover = 0
+    render()
+  end
 end
 
 function activate(it)
@@ -286,7 +290,17 @@ function onKey(chord, pressed)
     state.selected = math.max(state.selected - 1, 1)
     state.hover = 0
     render()
-  elseif chord == "enter" then
+  elseif chord == "enter" or chord == "right" then
     onSubmit()
+  elseif chord == "left" then
+    if #state.path > 0 then
+      table.remove(state.path)
+      state.query = ""
+      state.selected = 1
+      state.hover = 0
+      render()
+    else
+      panel.close()
+    end
   end
 end

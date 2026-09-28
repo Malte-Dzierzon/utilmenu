@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-# About: fastfetch in foot (mit WAYLAND_DISPLAY für Hyprland).
+# About: fastfetch in float-term (Sixel-Logo, eigene kleine Config fürs Panel-Format).
 WD=$(ls -t "$XDG_RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v lock | head -1); WD=${WD##*/}
-setsid env WAYLAND_DISPLAY="$WD" foot -a float-term bash -lc 'fastfetch; read -rp "Press Enter to close " _' & disown
+setsid env WAYLAND_DISPLAY="$WD" TERM=xterm-256color foot -a float-term \
+  bash -lc 'fastfetch --logo-type sixel --logo-width 24 --logo-height 12; read -rp "Press Enter to close " _' & disown
