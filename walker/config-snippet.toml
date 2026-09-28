@@ -10,78 +10,78 @@ empty = ["menus:utilmenu"]
 [providers.actions]
 "menus:utilmenu" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_apps" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_trigger" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_style" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_setup" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_install" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_remove" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_nixos" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_learn" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_about" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
 "menus:utilmenu_system" = [
   { action = "menus:open", bind = "Return", default = true, after = "ClearReload" },
-  { action = "menus:default", bind = "Right", after = "ClearReload" },
-  { action = "menus:parent", bind = "Left", after = "Reload" },
+  { action = "menus:open", bind = "Right", default = true, after = "ClearReload" },
+  { action = "menus:parent", bind = "Left", after = "Nothing" },
   { action = "menus:parent", bind = "BackSpace", after = "ClearReload" },
   { action = "menus:parent", bind = "Escape", after = "ClearReload" },
 ]
